@@ -187,7 +187,7 @@ python Shrinkage_grid_search_fixed_kappa.py
 
 #### **C. The Integrated Robust Model**
 
-**`run_covariance_dynamic_bl.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0, 1.5}`) with the robust covariance estimators (Sample vs. L2 vs. Shrinkage) to evaluate the most advanced iteration of the model.
+**`run_covariance_dynamic_bl.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0, 1.5}`) with the robust covariance estimators (Sample vs. L2 vs. Shrinkage with constant shrinkage strength $s = 0.35$) to evaluate the most advanced iteration of the model.
 
 ```bash
 python run_covariance_dynamic_bl.py
