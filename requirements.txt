@@ -1,0 +1,18 @@
+# Data Acquisition and Processing
+numpy
+pandas
+pandas_datareader
+yahooquery
+
+# Optimization and Mathematical Modeling
+cvxpy
+scipy
+
+# Machine Learning
+scikit-learn
+
+# Visualization
+matplotlib
+
+# Export Utilities
+openpyxl
