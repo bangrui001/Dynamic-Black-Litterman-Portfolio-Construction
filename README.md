@@ -149,9 +149,12 @@ The core experiment uses a consistent set of default values defined in the `Back
 
 Each script isolates different moving parts of the framework to evaluate model robustness:
 
+
+---
+
 #### **A. Strategy Benchmarking**
 
-**`run_experiment_br.py`**: Benchmarks Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline.
+**`run_experiment_br.py`**: Benchmarks the core Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline.
 
 ```bash
 python run_experiment_br.py
@@ -160,19 +163,24 @@ python run_experiment_br.py
 
 #### **B. Covariance Robustness & Grid Search**
 
-**`Shrinkage_grid_search_fixed_kappa.py`**: A specialized script for testing covariance sensitivity.
+This section isolates the impact of different covariance estimators to address estimation noise. There are two ways to run these tests:
 
-* **Experiment 1**: Iterates over shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to find the optimal trade-off between sample structure and the target matrix.
-* **Experiment 2**: Compares Sample, L2 Regularized (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$.
-
+* **Experiment 1 (Shrinkage Grid Search)**: Iterates over various shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to evaluate the optimal trade-off between sample structure and the target matrix.
 ```bash
 python Shrinkage_grid_search_fixed_kappa.py
+
+```
+*(Note: To run Experiment 2 from this file instead, you must modify the `__main__` block at the bottom of the script).*
+
+* **Experiment 2 (Covariance Comparison)**: Directly compares Sample Covariance, L2 Regularized Covariance (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$ assumption. You can run the dedicated standalone script for this:
+```bash
+python run_covariance_fixed_kappa.py
 
 ```
 
 #### **C. The Integrated Robust Model**
 
-**`run_covariance_dynamic_bl.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0, 1.5}`) with robust covariance estimators.
+**`run_covariance_dynamic_bl.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0, 1.5}`) with the robust covariance estimators (Sample vs. L2 vs. Shrinkage) to evaluate the most advanced iteration of the model.
 
 ```bash
 python run_covariance_dynamic_bl.py
@@ -180,7 +188,7 @@ python run_covariance_dynamic_bl.py
 ```
 
 > [!IMPORTANT]
-> All results, including the Evaluation Matrix and PDF charts, are automatically exported to the `/result/` directory (or designated experiment folder) upon completion of a run.
+> All results, including the Evaluation Matrix (`.xlsx`) and PDF charts, are automatically exported to specific folders generated during execution (e.g., `/result/`, `/result_shrinkage_grid/`, or `/result_dynamic_cov_backtest/`).
 
 ---
 
