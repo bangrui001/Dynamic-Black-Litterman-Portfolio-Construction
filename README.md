@@ -154,14 +154,13 @@ Each script isolates different moving parts of the framework to evaluate model r
 
 #### **A. Strategy Benchmarking**
 
-**`run_experiment_br.py`**: Benchmarks the core Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline.
+**`run_experiment_br.py`**: Benchmarks the core Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline. We only used Sample Covariance in this test.
 
 ```bash
 python run_experiment_br.py
 
 ```
 
-Here is the properly formatted and polished version. I fixed the broken markdown code blocks (you were missing the closing backticks on the first bash block) and organized it with clean bullet points so it renders perfectly on GitHub.
 
 ---
 
