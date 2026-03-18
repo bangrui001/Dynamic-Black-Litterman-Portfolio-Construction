@@ -96,7 +96,7 @@ $$\Sigma_{L2} = S + \lambda I$$
 
 ### 5. Turnover-Aware Portfolio Optimization
 
-The final portfolio weights are solved using a long-only Mean-Variance Optimizer powered by `CVXPY`. To prevent excessive rebalancing driven by shifting expected returns, an $L_1$-norm penalty is applied to model transaction costs ($tc$):
+The final portfolio weights are solved using a long-only Mean-Variance Optimizer powered by `CVXPY`. To prevent excessive rebalancing driven by shifting expected returns, an $L_1$-norm penalty is applied to model transaction costs:
 
 $$\max_{w} \ w^T \mu_{BL} - \frac{\gamma}{2} w^T \Sigma_{BL} w - tc \|w - w_{drift}\|_1$$
 
