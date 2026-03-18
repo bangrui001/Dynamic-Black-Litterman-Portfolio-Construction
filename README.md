@@ -107,37 +107,82 @@ $$\sum_{i=1}^{N} w_i = 1, \quad w_i \ge 0$$
 
 Where $w_{drift}$ represents the current portfolio weights drifted by the previous period's asset returns.
 
+
+---
+
 ## 🚀 Experimental Setup & Usage
 
-The repository contains distinct execution scripts to replicate the empirical research, each isolating different moving parts of the framework:
+### 1. Environment Installation
 
-1. **`run_experiment_br.py`**
-Benchmarks the core Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline.
+Before running any experiments, install the required dependencies using the provided `requirements.txt` to ensure all mathematical solvers and data pipelines function correctly.
+
+```bash
+pip install -r requirements.txt
+
+```
+
+**Core Dependencies:**
+
+* **Data Acquisition**: `numpy`, `pandas`, `pandas_datareader`, and `yahooquery` for fetching market prices and FRED macro signals.
+* **Optimization**: `cvxpy` and `scipy` for solving the long-only Mean-Variance problem with $L_1$ penalties.
+* **Machine Learning**: `scikit-learn` for the Ridge Regression-based view generation.
+* **Visualization & Export**: `matplotlib` for generating underwater plots and `openpyxl` for data handling.
+
+---
+
+### 2. Baseline Configuration (Fixed Parameters)
+
+The core experiment uses a consistent set of default values defined in the `BacktestConfig` class to ensure a fair comparison across all strategies:
+
+| Parameter | Default Value | Description |
+| --- | --- | --- |
+| **Risk Aversion ($\delta$)** | `2.5` | Represents the market's average risk-reward trade-off. |
+| **Tau ($\tau$)** | `0.05` | Scalar weight for the relative certainty of views. |
+| **Window Months** | `60` | 5-year rolling lookback for training Ridge models. |
+| **Transaction Cost** | `0.001` | 0.1% penalty per unit of turnover. |
+| **Ridge Alpha** | `1.0` | L2 regularization strength for view generation. |
+| **Kappa ($\kappa$)** | `0.25` | Default multiplier for the $\Omega$ matrix. |
+
+---
+
+### 3. Execution Scripts (Experimental Variables)
+
+Each script isolates different moving parts of the framework to evaluate model robustness:
+
+#### **A. Strategy Benchmarking**
+
+**`run_experiment_br.py`**: Benchmarks Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline.
+
 ```bash
 python run_experiment_br.py
 
 ```
 
+#### **B. Covariance Robustness & Grid Search**
 
-2. **`Shrinkage_grid_search_fixed_kappa.py`**
-A highly specialized script for testing covariance robustness. It contains two configurable execution blocks:
-* **Experiment 1 (Shrinkage Grid Search)**: Iterates over various shrinkage strengths ($s = 0.25, 0.50, 0.75, 1.00$) to evaluate the optimal trade-off between sample structure and the target matrix.
-* **Experiment 2 (Covariance Comparison)**: Isolates the impact of different covariance estimators by directly comparing Sample Covariance, L2 Regularized Covariance, and Shrinkage Covariance under a fixed $\kappa = 0.25$ assumption.
+**`Shrinkage_grid_search_fixed_kappa.py`**: A specialized script for testing covariance sensitivity.
 
+* **Experiment 1**: Iterates over shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to find the optimal trade-off between sample structure and the target matrix.
+* **Experiment 2**: Compares Sample, L2 Regularized (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$.
 
 ```bash
 python Shrinkage_grid_search_fixed_kappa.py
 
 ```
 
+#### **C. The Integrated Robust Model**
 
-3. **`run_covariance_dynamic_bl.py`**
-The ultimate robustness test. It combines the Walk-Forward Dynamic $\Omega$ builder with the robust covariance estimators (Sample vs. L2 vs. Shrinkage) to evaluate the most advanced iteration of the model.
+**`run_covariance_dynamic_bl.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0, 1.5}`) with robust covariance estimators.
+
 ```bash
 python run_covariance_dynamic_bl.py
 
 ```
 
+> [!IMPORTANT]
+> All results, including the Evaluation Matrix and PDF charts, are automatically exported to the `/result/` directory (or designated experiment folder) upon completion of a run.
+
+---
 
 
 ## 📈 Performance Evaluation
@@ -150,7 +195,6 @@ Upon execution, the engine automatically generates a comprehensive evaluation ma
 * Annualized Turnover
 * Automated plotting for Cumulative Returns (Log Scale), Underwater Drawdown charts, and Asset Allocation Stackplots.
 
-Here is a professional **Conclusion & Key Findings** section for your README, summarizing the technical advantages of your framework.
 
 ---
 
