@@ -161,22 +161,30 @@ python run_experiment_br.py
 
 ```
 
+Here is the properly formatted and polished version. I fixed the broken markdown code blocks (you were missing the closing backticks on the first bash block) and organized it with clean bullet points so it renders perfectly on GitHub.
+
+---
+
 #### **B. Covariance Robustness & Grid Search**
 
-This section isolates the impact of different covariance estimators to address estimation noise. There are two ways to run these tests:
+This section isolates the impact of different covariance estimators to address estimation noise. There are two distinct tests:
 
-* **Experiment 1 (Shrinkage Grid Search)**: Iterates over various shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to evaluate the optimal trade-off between sample structure and the target matrix.
-```bash
-python Shrinkage_grid_search_fixed_kappa.py
-
-```
-*(Note: To run Experiment 2 from this file instead, you must modify the `__main__` block at the bottom of the script).*
-
-* **Experiment 2 (Covariance Comparison)**: Directly compares Sample Covariance, L2 Regularized Covariance (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$ assumption. You can run the dedicated standalone script for this:
+* **Experiment 1 (Covariance Comparison)**: Directly compares Sample Covariance, L2 Regularized Covariance (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$ and shrinkage strength $s = 0.35$. You can run the dedicated standalone script for this:
 ```bash
 python run_covariance_fixed_kappa.py
 
 ```
+
+
+* **Experiment 2 (Shrinkage Grid Search)**: Iterates over various shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to evaluate the optimal trade-off between the sample structure and the target matrix.
+```bash
+python Shrinkage_grid_search_fixed_kappa.py
+
+```
+
+*(Note: Both experiments are also housed within the `Shrinkage_grid_search_fixed_kappa.py` file. If you prefer to run Experiment 1 from there instead of the standalone script, simply comment/uncomment the corresponding functions in the `__main__` execution block at the bottom of the script).*
+
+
 
 #### **C. The Integrated Robust Model**
 
