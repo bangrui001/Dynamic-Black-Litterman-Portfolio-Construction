@@ -152,9 +152,24 @@ Each script isolates different moving parts of the framework to evaluate model r
 
 ---
 
-#### **A. Strategy Benchmarking**
+#### **A. Strategy Evaluation & Benchmarking**
 
-**`run_experiment_br.py`**: Benchmarks the core Proposed strategies (Baseline $\Omega$, Fixed $\Omega$, Dynamic WFO $\Omega$) against standard MVO, standard BL, and an Equal Weight (1/N) baseline. We used Sample Covariance in this test.
+
+**`run_experiment_br.py'**: This script executes a comparative backtest across six distinct portfolio formulations, segmented into a baseline control group and our proposed Black-Litterman (BL) enhancements.
+
+**1. Control Group (Standard Baselines)**
+* **$1/N$ (Equal Weight):** The naive, zero-information allocation benchmark.
+* **Standard MVO:** Unconstrained Mean-Variance Optimization. Assumes zero estimation error in the Ridge regression view vector $\mathbf{q}$ (effectively strictly enforcing $\mathbf{\Omega} \to \mathbf{0}$).
+* **Standard BL:** The standard Black-Litterman framework utilizing standard heuristic calibrations for the scalar $\tau$ and the uncertainty matrix $\mathbf{\Omega}$.
+
+**2. Experimental Group (Proposed Enhancements)**
+* **Proposed 1 (Baseline $\mathbf{\Omega}$):** A data-driven formulation where the diagonal elements of $\mathbf{\Omega}$ are strictly defined by the residual variance ($\sigma^2_{\epsilon}$) of the Ridge estimation, quantifying specific forecast noise.
+* **Proposed 2 (Fixed $\kappa$):** Introduces a static hyperparameter ($\kappa = 0.25$) to explicitly calibrate the signal-to-noise ratio between the macroeconomic views and the market equilibrium prior.
+* **Proposed 3 (Dynamic WFO $\mathbf{\Omega}$):** An adaptive confidence model. Utilizes Walk-Forward Optimization (WFO) to periodically solve $\arg\max_{\kappa} \text{Sharpe Ratio}$ over a rolling 24-month lookback, allowing the confidence scalar to dynamically adjust to shifting volatility regimes.
+
+**Experimental Control: Sample Covariance**
+To maintain rigorous causal inference, the prior risk model ($\mathbf{\Sigma}$) is strictly locked to the standard sample covariance estimator. By fixing the risk model and the signal generation ($\mathbf{q}$), we isolate the marginal performance contribution of our $\mathbf{\Omega}$ specifications. 
+
 
 ```bash
 python run_experiment_br.py
@@ -166,7 +181,9 @@ python run_experiment_br.py
 
 #### **B. Covariance Robustness & Grid Search**
 
-This section isolates the impact of different covariance estimators to address estimation noise. There are two distinct tests:
+This section isolates the impact of different covariance estimators to address estimation noise. We introduce L2 Regularization and Shrinkage estimators to mitigate the ill-conditioning and estimation error inherent in the sample $\mathbf{\Sigma}$
+
+There are two distinct tests:
 
 * **Experiment 1 (Covariance Comparison)**: Directly compares Sample Covariance, L2 Regularized Covariance (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$ and shrinkage strength $s = 0.35$. You can run the dedicated standalone script for this:
 ```bash
