@@ -222,13 +222,18 @@ python backtest_covariance_dynamic_kappa.py
 
 ## 📈 Performance Evaluation
 
-Upon execution, the engine automatically generates a comprehensive evaluation matrix saved to the `result/` directory, including:
+Upon execution, the engine automatically generates a comprehensive evaluation matrix along with a suite of performance visualizations. The reported metrics include:
 
-* Annualized Return & Volatility
-* Sharpe Ratio & Information Ratio
-* Maximum Drawdown & 95% Value at Risk (VaR)
-* Annualized Turnover
-* Automated plotting for Cumulative Returns (Log Scale), Underwater Drawdown charts, and Asset Allocation Stackplots.
+- **Annualized Return & Volatility**
+- **Sharpe Ratio & Information Ratio**
+- **Maximum Drawdown & 95% Value at Risk (VaR)**
+- **Annualized Turnover**
+
+The pipeline also produces:
+
+- **Cumulative return curves (log scale)**
+- **Underwater (drawdown) plots**
+- **Asset allocation stack plots**
 
 
 ---
@@ -258,7 +263,9 @@ The following table synthesizes the performance across all major strategies, com
 | **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.32% | **-5.268%** | -8.55% |
 | **Annualized Turnover** | 0.00% | 71.00% | 399.22% | 95.48% | **20.35%** | 96.22% |
 
----
+**Dynamic BL:** A Black-Litterman model with dynamically calibrated view uncertainty, where $\kappa$ is optimized via Walk-Forward Optimization to adapt the signal-to-noise balance across evolving market regimes. 
+
+The reported results are constructed from outputs in the `results_omega_methods_sample_cov_backtest` and `results_dynamic_kappa_cov_backtest` directories.
 
 ### 3. Does This Experiment Solve the MVO Problem?
 
