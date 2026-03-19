@@ -145,76 +145,79 @@ The core experiment uses a consistent set of default values defined in the `Back
 
 ---
 
-### 3. Execution Scripts (Experimental Variables)
+## 🧪 3. Execution Scripts (Experimental Variables)
 
-Each script isolates different moving parts of the framework to evaluate model robustness:
-
+Each script isolates specific components of the framework to evaluate model robustness and the impact of estimation error mitigation.
 
 ---
 
 #### **A. Strategy Evaluation & Benchmarking**
-
-
-**`backtest_omega_methods_sample_cov.py`**: This script executes a comparative backtest across six distinct portfolio formulations, segmented into a baseline control group and our proposed Black-Litterman (BL) enhancements.
+`backtest_omega_methods_sample_cov.py`
+This script performs a comparative backtest across six portfolio formulations to isolate the marginal impact of different uncertainty ($\mathbf{\Omega}$) specifications.
 
 **1. Control Group (Standard Baselines)**
-* **$1/N$ (Equal Weight):** The naive, zero-information allocation benchmark.
-* **Standard MVO:** Unconstrained Mean-Variance Optimization. Assumes zero estimation error in the Ridge regression view vector $\mathbf{q}$ (effectively strictly enforcing $\mathbf{\Omega} \to \mathbf{0}$).
-* **Standard BL:** The standard Black-Litterman framework utilizing standard heuristic calibrations for the scalar $\tau$ and the uncertainty matrix $\mathbf{\Omega}$.
+* **$1/N$ (Equal Weight):** A naive, zero-information allocation benchmark.
+* **Standard MVO:** Unconstrained Mean-Variance Optimization. Assumes zero estimation error in the Ridge views ($\mathbf{\Omega} \to \mathbf{0}$).
+* **Standard BL:** The classical Black-Litterman framework using heuristic calibrations for $\tau$ and $\mathbf{\Omega}$.
 
 **2. Experimental Group (Proposed Enhancements)**
-* **Proposed 1 (Baseline $\mathbf{\Omega}$):** A data-driven formulation where the diagonal elements of $\mathbf{\Omega}$ are strictly defined by the residual variance ($\sigma^2_{\epsilon}$) of the Ridge estimation, quantifying specific forecast noise.
-* **Proposed 2 (Fixed $\kappa$):** Introduces a static hyperparameter ($\kappa = 0.25$) to explicitly calibrate the signal-to-noise ratio between the macroeconomic views and the market equilibrium prior.
-* **Proposed 3 (Dynamic WFO $\mathbf{\Omega}$):** An adaptive confidence model. Utilizes Walk-Forward Optimization (WFO) to periodically solve $\arg\max_{\kappa} \text{Sharpe Ratio}$ over a rolling 24-month lookback, allowing the confidence scalar to dynamically adjust to shifting volatility regimes.
+* **Proposed 1 (Baseline $\mathbf{\Omega}$):** A data-driven formulation where the diagonal of $\mathbf{\Omega}$ is defined by the residual variance ($\sigma^2_{\epsilon}$) of the Ridge estimation.
+* **Proposed 2 (Fixed $\kappa$):** Introduces a static hyperparameter ($\kappa = 0.25$) to calibrate the signal-to-noise ratio.
+* **Proposed 3 (Dynamic WFO $\mathbf{\Omega}$):** An adaptive model using Walk-Forward Optimization (WFO) to solve $\arg\max_{\kappa} \text{Sharpe Ratio}$ over a rolling 24-month lookback window, allowing the confidence scalar $\kappa$ to dynamically adjust to changing market conditions.
 
-**Experimental Control: Sample Covariance**
-To maintain rigorous causal inference, the prior risk model ($\mathbf{\Sigma}$) is strictly locked to the standard sample covariance estimator. By fixing the risk model and the signal generation ($\mathbf{q}$), we isolate the marginal performance contribution of our $\mathbf{\Omega}$ specifications. 
-
+> **Experimental Control:** The risk model ($\mathbf{\Sigma}$) is fixed to the **Sample Covariance** estimator to ensure causal interpretability of $\mathbf{\Omega}$ specifications.
 
 ```bash
 python backtest_omega_methods_sample_cov.py
-
 ```
-
+*Results are exported to the `results_omega_methods_sample_cov_backtest` folder.*
 
 ---
 
 #### **B. Covariance Robustness & Grid Search**
+This section evaluates the impact of covariance estimation methods in addressing estimation noise within the risk matrix $\mathbf{\Sigma}$.
 
-This section isolates the impact of different covariance estimators to address estimation noise. We introduce L2 Regularization and Shrinkage estimators to mitigate the ill-conditioning and estimation error inherent in the sample $\mathbf{\Sigma}$
+**Experiment 1: Covariance Comparison**
+Compares the following estimators under a fixed $\kappa = 0.25$:
+* **Sample Covariance**
+* **L2-Regularized Covariance** (penalty = 0.10)
+* **Shrinkage Covariance** (shrinkage strength $s = 0.35$)
 
-There are two distinct tests:
-
-* **Experiment 1 (Covariance Comparison)**: Directly compares Sample Covariance, L2 Regularized Covariance (penalty = 0.10), and Shrinkage Covariance under a fixed $\kappa = 0.25$ and shrinkage strength $s = 0.35$. You can run the dedicated standalone script for this:
 ```bash
 python backtest_covariance_fixed_kappa.py
-
 ```
+*Results are exported to the `results_fixed_kappa_cov_backtest` folder.*
 
+**Experiment 2: Shrinkage Grid Search**
+Evaluates the sensitivity of the portfolio to varying shrinkage intensities:
+$$s \in \{0.25, 0.50, 0.75, 1.00\}$$
 
-* **Experiment 2 (Shrinkage Grid Search)**: Iterates over various shrinkage strengths ($s \in \{0.25, 0.50, 0.75, 1.00\}$) to evaluate the optimal trade-off between the sample structure and the target matrix.
 ```bash
 python backtest_shrinkage_grid_search_fixed_kappa.py
-
 ```
+*Results are exported to the `results_fixed_kappa_shrinkage_cov_grid` folder.*
 
-*(Note: Both experiments are also housed within the `backtest_shrinkage_grid_search_fixed_kappa.py` file. If you prefer to run Experiment 1 from there instead of the standalone script, simply comment/uncomment the corresponding functions in the `__main__` execution block at the bottom of the script).*
-
-
+---
 
 #### **C. The Integrated Robust Model**
+`backtest_covariance_dynamic_kappa.py`
+This represents the most advanced configuration, evaluating the joint impact of dynamic confidence calibration and covariance stabilization.
 
-**`backtest_covariance_dynamic_kappa.py`**: The ultimate robustness test. It combines the **Walk-Forward Dynamic $\Omega$** (optimizing $\kappa$ from a grid of `{0.1, 0.25, 0.5, 0.75, 1.0}`) with the robust covariance estimators (Sample vs. L2 vs. Shrinkage with constant shrinkage strength $s = 0.35$) to evaluate the most advanced iteration of the model.
+* **Dynamic $\mathbf{\Omega}$ (via WFO):** $\kappa \in \{0.1, 0.25, 0.5, 0.75, 1.0\}$.
+* **Robust Covariance Estimators:** Comparative analysis of Sample, L2-regularized, and Shrinkage ($s = 0.35$) methods.
 
 ```bash
 python backtest_covariance_dynamic_kappa.py
-
 ```
-
-> [!IMPORTANT]
-> All results, including the Evaluation Matrix (`.xlsx`) and PDF charts, are automatically exported to the corresponding result folders generated during execution.
+*Results are exported to the `results_dynamic_kappa_cov_backtest` folder.*
 
 ---
+
+> [!IMPORTANT]
+> All outputs—including **evaluation metrics (.xlsx)** and **visualization charts (PDF)**—are automatically saved to the corresponding result directories generated during execution.
+
+---
+
 
 
 ## 📈 Performance Evaluation
@@ -251,11 +254,9 @@ The following table synthesizes the performance across all major strategies, com
 | **Sharpe Ratio** | 1.145 | 1.161 | 1.096 | **1.182** | 1.085 | 1.171 |
 | **Information Ratio** | N/A | 0.894 | 0.610 | 0.458 | -0.455 | **0.551** |
 | **Maximum Drawdown** | **-20.29%** | -45.25% | -31.65% | -26.28% | -20.39% | -26.70% |
-| **Annualized Volatility** | 14.94% | 34.88% | 24.18% | 17.73% | 14.90% | 19.09% |
-| **Value at Risk (95%)** | -5.27% | -12.73% | -10.59% | -0.083 | -0.053 | -0.086 |
+| **Annualized Volatility** | 14.94% | 34.88% | 24.18% | 17.73% | **14.90%** | 19.09% |
+| **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.32% | **-5.268%** | -8.55% |
 | **Annualized Turnover** | 0.00% | 71.00% | 399.22% | 95.48% | **20.35%** | 96.22% |
-
-*Proposed strategy metrics (Dynamic BL) derived from. Benchmark metrics derived from experimental results.*
 
 ---
 
@@ -286,7 +287,5 @@ The second failure of MVO is its sensitivity to the inverse of a noisy covarianc
 * **The "WFO Lag":** The Walk-Forward Optimization relies on a historical lookback to calibrate confidence, which may introduce a delay in adapting to sudden, unprecedented market shocks.
 
 **Final Verdict:** The **Dynamic BL + Shrinkage Covariance** model is a superior architecture for professional applications. It successfully bridges the gap between macroeconomic theory and stable execution by replacing naive MVO inputs with Bayesian priors and conditioned risk estimates.
-
-
 
 ---
