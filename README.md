@@ -15,6 +15,7 @@ How can we construct stable and robust portfolios when the investment universe i
 
 The backtest engine (`bl_backtest_engine.py`) is designed with a fully decoupled architecture, allowing researchers to plug in custom callables for signal generation, covariance estimation, and portfolio optimization.
 
+
 ### 🌐 Asset Universe
 
 The portfolio consists of 20 diverse assets specifically selected to represent a global investment opportunity set:
@@ -27,6 +28,25 @@ The portfolio consists of 20 diverse assets specifically selected to represent a
 | **International** | EFA, EEM | Developed (Ex-US) and Emerging Markets exposure. |
 | **Fixed Income** | TLT | Long-term U.S. Treasury bonds for duration and hedging. |
 | **Alternatives** | VNQ, XLE, XLK, XLV | Real Estate (REITs) and specific Sector SPDRs. |
+
+---
+
+### 📊 Correlation Structure of the Asset Universe
+
+To better understand the dependence structure of the portfolio universe, we compute return correlations for ETFs, individual stocks, and the combined asset universe, and visualize the cross-sectional relationships using correlation heatmaps. These assets define the investment universe for portfolio construction.
+
+To mitigate look-ahead bias, the correlation analysis is conducted using historical data from **2005–2019**, while the portfolio models are evaluated over **2020–2025** using a rolling training framework.
+
+The correlation results reveal several important characteristics of the universe:
+
+- **Strong equity clustering:** Most equity ETFs and large-cap stocks exhibit high positive correlations, indicating substantial overlap in market exposure.  
+- **Sector concentration:** Technology-related assets such as QQQ, XLK, AAPL, MSFT, and NVDA form a particularly tight cluster, suggesting strong common factor exposure.  
+- **Limited diversification within equities:** Although the universe spans multiple sectors and regions, many assets remain highly correlated, reducing the true diversification benefit of naive allocation.  
+- **TLT as a diversifier:** Long-duration U.S. Treasuries show low or negative correlation with most equity assets, making them one of the few meaningful hedging instruments in the universe.  
+- **Implication for portfolio optimization:** The high-correlation structure makes the sample covariance matrix more likely to be ill-conditioned, which can destabilize classical Mean-Variance Optimization (MVO) and amplify estimation error.  
+
+This correlation analysis motivates the central research problem of the project: constructing stable and robust portfolios in a highly correlated asset universe, where noisy expected returns and unstable covariance estimation can lead to extreme and unreliable portfolio weights.
+
 
 ---
 
