@@ -282,7 +282,7 @@ The following table synthesizes the performance across all major strategies, com
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Annualized Return** | 17.10% | **40.49%** | 26.51% | 20.94% | 16.17% | 22.36% |
 | **Sharpe Ratio** | 1.145 | 1.161 | 1.096 | **1.182** | 1.085 | 1.171 |
-| **Information Ratio** | N/A | 0.894 | 0.610 | 0.458 | -0.455 | **0.551** |
+| **Information Ratio** | N/A | **0.894** | 0.610 | 0.458 | -0.455 | 0.551 |
 | **Maximum Drawdown** | **-20.29%** | -45.25% | -31.65% | -26.28% | -20.39% | -26.70% |
 | **Annualized Volatility** | 14.94% | 34.88% | 24.18% | 17.73% | **14.90%** | 19.09% |
 | **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.32% | **-5.268%** | -8.55% |
@@ -290,7 +290,7 @@ The following table synthesizes the performance across all major strategies, com
 
 **Dynamic BL:** A Black-Litterman model with dynamically calibrated view uncertainty, where $\kappa$ is optimized via Walk-Forward Optimization to adapt the signal-to-noise balance across evolving market regimes. 
 
-The reported results are constructed from outputs in the `results_omega_methods_sample_cov_backtest` and `results_dynamic_kappa_cov_backtest` directories.
+The reported results are constructed from outputs in the `results_omega_methods_sample_cov_backtest` and `results_dynamic_kappa_cov_backtest` directories. All Sharpe ratios are computed under the assumption of a zero risk-free rate.
 
 ### 3. Does This Experiment Solve the MVO Problem?
 
