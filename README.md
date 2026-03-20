@@ -6,6 +6,11 @@ This repository implements a highly modular, end-to-end quantitative backtesting
 
 The goal is to address the notorious "error-maximizing" nature of standard Mean-Variance Optimization (MVO) by producing stable, theoretically sound, and transaction-cost-aware portfolio weights.
 
+## 🎯 Core Research Problem 
+
+How can we construct stable and robust portfolios when the investment universe is highly correlated, leading to estimation error and instability in classical mean-variance optimization?
+
+
 ## ⚙️ Architecture & Data Pipeline
 
 The backtest engine (`bl_backtest_engine.py`) is designed with a fully decoupled architecture, allowing researchers to plug in custom callables for signal generation, covariance estimation, and portfolio optimization.
