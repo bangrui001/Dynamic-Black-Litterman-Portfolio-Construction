@@ -111,7 +111,7 @@ High-dimensional covariance matrices are prone to estimation errors, leading to 
 $$\Sigma_{shrink} = (1 - s)S + s F$$
 
 > **Hyperparameter Sensitivity**: The engine includes a dedicated grid search module to empirically test the impact of the **Shrinkage Strength** parameter:
-> * $s \in \{0.25, 0.50, 0.75, 1.00\}$
+> - s ∈ {0.25, 0.50, 0.75, 1.00}
 
 * **L2 Regularized Covariance**: Adds a penalty to the diagonal to ensure strict positive semi-definiteness and reduce condition numbers:
 
@@ -188,7 +188,7 @@ This script performs a comparative backtest across six portfolio formulations to
 **2. Experimental Group (Proposed Enhancements)**
 * **Proposed 1 (Baseline $\mathbf{\Omega}$):** A data-driven formulation where the diagonal of $\mathbf{\Omega}$ is defined by the residual variance ($\sigma^2_{\epsilon}$) of the Ridge estimation.
 * **Proposed 2 (Fixed $\kappa$):** Introduces a static hyperparameter ($\kappa = 0.25$) to calibrate the signal-to-noise ratio.
-* **Proposed 3 (Dynamic WFO $\mathbf{\Omega}$):** An adaptive model using Walk-Forward Optimization (WFO) to solve $\arg\max_{\kappa} \text{Sharpe Ratio}$ over a rolling 24-month lookback window, allowing the confidence scalar $\kappa$ to dynamically adjust to changing market conditions.
+* **Proposed 3 (Dynamic WFO $\mathbf{\Omega}$):** An adaptive model using Walk-Forward Optimization (WFO) to solve $\arg\max_{\kappa} \text{Sharpe Ratio}$ over a rolling 24-month lookback window, allowing the confidence scalar $\kappa$ to dynamically adjust to changing market conditions. κ ∈ {0.1, 0.25, 0.5, 0.75, 1.0, 1.5}
 
 > **Experimental Control:** The risk model ($\mathbf{\Sigma}$) is fixed to the **Sample Covariance** estimator to ensure causal interpretability of $\mathbf{\Omega}$ specifications.
 
@@ -228,7 +228,7 @@ python backtest_shrinkage_grid_search_fixed_kappa.py
 `backtest_covariance_dynamic_kappa.py`
 This represents the most advanced configuration, evaluating the joint impact of dynamic confidence calibration and covariance stabilization.
 
-* **Dynamic $\mathbf{\Omega}$ (via WFO):** $\kappa \in \{0.1, 0.25, 0.5, 0.75, 1.0\}$.
+* **Dynamic Ω (via WFO):** κ ∈ {0.1, 0.25, 0.5, 0.75, 1.0, 1.5}
 * **Robust Covariance Estimators:** Comparative analysis of Sample, L2-regularized, and Shrinkage ($s = 0.35$) methods.
 
 ```bash
