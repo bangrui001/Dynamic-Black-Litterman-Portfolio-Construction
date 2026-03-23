@@ -313,7 +313,7 @@ The following table synthesizes the performance across all major strategies, com
 
 The following table compares the performance of the Sentiment-Driven Dynamic Black-Litterman (BL) models against traditional benchmarks. The **Sentiment Dynamic BL** represents the core strategy integrating directional sentiment encoding into the prior distribution.
 
-| Metric | Equal Weight (1/N) | Benchmark 1 (MVO) | Benchmark 2 (Std BL) | Sentiment Dynamic BL | Dynamic BL (Sample) | Dynamic BL (L2 Reg) | Dynamic BL (Shrink) |
+| Metric | Equal Weight (1/N) | Benchmark 1 (MVO) | Benchmark 2 (Std BL) | Sentiment Dynamic BL (Sample) | Dynamic BL (Sample) | Dynamic BL (L2 Reg) | Dynamic BL (Shrink) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Annualized Return** | 17.10% | **40.49%** | 26.51% | 21.94% | 20.94% | 16.17% | 22.36% |
 | **Sharpe Ratio** | 1.145 | 1.161 | 1.096 | 1.126 | **1.182** | 1.085 | 1.171 |
