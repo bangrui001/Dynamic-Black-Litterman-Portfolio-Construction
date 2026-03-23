@@ -132,9 +132,14 @@ $$\Sigma_{shrink} = (1 - s)S + s F$$
 > **Hyperparameter Sensitivity**: The engine includes a dedicated grid search module to empirically test the impact of the **Shrinkage Strength** parameter:
 > - s ∈ {0.25, 0.50, 0.75, 1.00}
 
-* **L2 Regularized Covariance**: Adds a penalty to the diagonal to ensure strict positive semi-definiteness and reduce condition numbers:
+* **L2 Regularized Covariance (Optimization-based)**: Estimates the covariance matrix by solving a regularized projection problem that stays close to the sample covariance while penalizing the Frobenius norm:
 
-$$\Sigma_{L2} = S + \lambda I$$
+$$
+\Sigma_{L2}
+=
+\arg\min_{\Sigma \succeq 0}
+\left\|\Sigma - S\right\|_F^2 + \lambda \left\|\Sigma\right\|_F^2
+$$
 
 
 
