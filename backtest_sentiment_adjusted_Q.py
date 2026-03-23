@@ -5,7 +5,7 @@ from sklearn.linear_model import Ridge
 
 from bl_backtest_engine import (
     BacktestConfig,
-    fetch_market_data,
+    prepare_data,
     run_single_strategy_backtest,
     build_equal_weight_benchmark,
     evaluate_strategies,
@@ -191,18 +191,14 @@ def sentiment_q_builder(
 def run_full_experiment():
     config = BacktestConfig(
         assets=ASSETS,
-        start_date="2015-01-01",
-        end_date="2025-12-31",
+        start_date='2015-01-02',
+        end_date='2025-12-30',
         window_months=60,
-        result_dir="result_sentiment_adjusted_Q_raw"
+        result_dir="result_sentiment_adjusted_Q"
     )
 
     print("Fetching market data...")
-    daily_rets, monthly_rets = fetch_market_data(
-        config.assets,
-        config.start_date,
-        config.end_date,
-    )
+    daily_rets, monthly_rets, _ = prepare_data(config)
 
     print("Building RAW sentiment features from CSV...")
     sent_raw, article_count, sentiment_df = build_monthly_sentiment_features(
