@@ -2,7 +2,7 @@
 
 ## 📖 Overview
 
-This repository implements a highly modular, end-to-end quantitative backtesting engine for multi-asset portfolio construction. It extends the traditional Black-Litterman (BL) model by dynamically integrating macroeconomic signals via Machine Learning (Ridge Regression) and employing advanced risk-management techniques, including Walk-Forward Optimization (WFO) for view confidence ($\Omega$) and robust covariance estimation (Shrinkage & L2 Regularization).
+This repository implements a highly modular, end-to-end quantitative backtesting engine for multi-asset portfolio construction. It extends the traditional Black-Litterman (BL) model by dynamically integrating macroeconomic signals or news-sentiment signals via Machine Learning (Ridge Regression) and employing advanced risk-management techniques, including Walk-Forward Optimization (WFO) for view confidence ($\Omega$) and robust covariance estimation (Shrinkage & L2 Regularization).
 
 The goal is to address the notorious "error-maximizing" nature of standard Mean-Variance Optimization (MVO) by producing stable, theoretically sound, and transaction-cost-aware portfolio weights.
 
@@ -53,11 +53,13 @@ This correlation analysis motivates the central research problem of the project:
 ### 📈 Data & Signals
 
 * **Market Data**: Daily and monthly adjusted close prices are fetched via `yahooquery`, covering the period from 2015 to 2025.
+
 * **Macroeconomic Factors**: Sourced directly from the Federal Reserve Economic Data (FRED) using `pandas_datareader`. Features are stationarized to prevent spurious regression:
-* **Growth Signal**: 1-month % change in Industrial Production (**INDPRO**).
-* **Inflation Signal**: 12-month % change (YoY) in Consumer Price Index (**CPIAUCSL**).
-* **Rates Signal**: 1-month absolute change in 10-Year Treasury Yield (**GS10**).
-* **Credit Signal**: 1-month absolute change in the Baa Corporate Bond Yield Spread (**BAA10Y**).
+  * **Growth Signal**: 1-month % change in Industrial Production (**INDPRO**).
+  * **Inflation Signal**: 12-month % change (YoY) in Consumer Price Index (**CPIAUCSL**).
+  * **Rates Signal**: 1-month absolute change in 10-Year Treasury Yield (**GS10**).
+  * **Credit Signal**: 1-month absolute change in the Baa Corporate Bond Yield Spread (**BAA10Y**).
+  
 * **News Sentiment Signals**: Constructed from article-level sentiment classifications stored in `market_news_with_sentiment.csv`. Each observation contains a timestamp, referenced ticker symbols, a sentiment label (`positive`, `neutral`, `negative`), and a confidence score. These article-level signals are transformed into monthly asset-level predictors through a structured aggregation pipeline:
 
 * **Directional Encoding**: Each article is mapped into a signed sentiment strength
@@ -91,10 +93,10 @@ where $N$ is the number of articles and $k = 10$ controls shrinkage intensity.
 
 * **Expanding Normalization**: Signals are standardized using expanding historical moments and smoothed with exponential weighting to maintain stationarity while avoiding look-ahead bias.
 
-These processed sentiment features form an alternative predictor matrix $X$ for Ridge-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than macroeconomic indicators alone.
+These processed sentiment features form an alternative predictor matrix $X$ for Ridge Regression-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than macroeconomic indicators alone.
 
+**Predictive Alignment**: The model implements a "point-in-time" approach where macro or news sentiment features at month $t$ are used to predict asset returns for month $t+1$. This structural lag is critical to eliminating look-ahead bias throughout the backtest.
 
-**Predictive Alignment**: The model implements a "point-in-time" approach where macro features at month $t$ are used to predict asset returns for month $t+1$. This structural lag is critical to eliminating look-ahead bias throughout the backtest.
 
 
 ## 🧮 Mathematical Framework
@@ -287,14 +289,10 @@ This experiment replaces macroeconomic predictors with news-derived sentiment si
 ```bash
 python backtest_sentiment_adjusted_Q.py
 
----
-
-> [!IMPORTANT]
-> All outputs—including **evaluation metrics (.xlsx)** and **visualization charts (PDF)**—are automatically saved to the corresponding result directories generated during execution.
+```
+*Results are exported to the `result_sentiment_adjusted_Q` folder.*
 
 ---
-
-
 
 ## 📈 Performance Evaluation
 
