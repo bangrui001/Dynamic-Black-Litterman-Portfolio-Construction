@@ -317,6 +317,16 @@ The following table synthesizes the performance across all major strategies, com
 | **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.32% | **-5.268%** | -8.55% |
 | **Annualized Turnover** | 0.00% | 71.00% | 399.22% | 95.48% | **20.35%** | 96.22% |
 
+| Metric | Equal Weight (1/N) | Benchmark 1 (MVO) | Sentiment BL (Baseline Ω) | Sentiment BL (Advanced Ω) | Sentiment Dynamic BL |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Annualized Return** | 18.07% | **43.31%** | 22.01% | 23.93% | 23.54% |
+| **Sharpe Ratio** | 1.076 | 1.250 | 1.155 | 1.177 | 1.045 |
+| **Information Ratio** | N/A | **0.991** | 0.668 | 0.717 | 0.485 |
+| **Maximum Drawdown** | **-20.29%** | -45.25% | -27.81% | -30.09% | -35.54% |
+| **Annualized Volatility** | 16.80% | 34.62% | 19.06% | 20.34% | 22.52% |
+| **Value at Risk (95%)** | -7.31% | -12.07% | -8.18% | -8.71% | -9.07% |
+| **Annualized Turnover** | 0.00% | 63.81% | 6.14% | 15.72% | 37.68% |
+
 **Dynamic BL:** A Black-Litterman model with dynamically calibrated view uncertainty, where $\kappa$ is optimized via Walk-Forward Optimization to adapt the signal-to-noise balance across evolving market regimes. 
 
 The reported results are constructed from outputs in the `results_omega_methods_sample_cov_backtest` and `results_dynamic_kappa_cov_backtest` directories. All Sharpe ratios are computed under the assumption of a zero risk-free rate.
