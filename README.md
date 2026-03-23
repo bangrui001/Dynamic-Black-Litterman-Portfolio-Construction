@@ -64,7 +64,9 @@ This correlation analysis motivates the central research problem of the project:
   
 * **Directional Encoding**: Each article is mapped into a signed sentiment strength
 
-  $$\text{sent\_strength} = \text{Label} \times \text{Score}$$
+  $$
+  S = \text{Label} \times \text{Score}
+  $$
 
   * **Label**: "positive" becomes $1$, "negative" becomes $-1$, and "neutral" becomes $0$.
   * **Temporal Aggregation (Monthly Matrix)**: The code shifts individual articles to a monthly view by grouping all articles by the Month and Ticker.
