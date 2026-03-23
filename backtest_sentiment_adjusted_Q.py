@@ -30,7 +30,7 @@ ASSETS = [
 
 
 # =========================================================
-# 2. BUILD MONTHLY RAW SENTIMENT MATRIX
+# 2. BUILD MONTHLY SENTIMENT MATRIX
 # =========================================================
 def build_monthly_sentiment_features(
     news_path: str,
@@ -38,10 +38,10 @@ def build_monthly_sentiment_features(
     monthly_index: pd.Index,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Build RAW monthly sentiment features from a CSV with columns:
+    Build monthly sentiment features from a CSV with columns:
       timestamp, symbols, headline, summary, sentiment_label, sentiment_score
 
-    RAW means:
+    means:
     - use only sentiment label mapping {-1, 0, 1}
     - no confidence scaling
     - no cross-ticker weighting
@@ -89,7 +89,7 @@ def build_monthly_sentiment_features(
     news_exploded = news.explode("symbols").rename(columns={"symbols": "ticker"})
     news_exploded = news_exploded[news_exploded["ticker"].isin(set(tickers))].copy()
 
-    # RAW sentiment: direction only
+    # sentiment: direction only
     label_sign = {"positive": 1, "negative": -1, "neutral": 0}
     direction = news_exploded["sentiment_label"].map(label_sign).fillna(0.0)
     news_exploded["sent_strength"] = direction * news_exploded["sentiment_score"].fillna(0.0)
@@ -138,7 +138,7 @@ def sentiment_q_builder(
     **kwargs
 ):
     """
-    Build Q from RAW sentiment only.
+    Build Q from sentiment only.
 
     For asset i:
         r_{i,t+1} = a_i + b_i * raw_sentiment_{i,t} + eps
@@ -200,7 +200,7 @@ def run_full_experiment():
     print("Fetching market data...")
     daily_rets, monthly_rets, _ = prepare_data(config)
 
-    print("Building RAW sentiment features from CSV...")
+    print("Building sentiment features from CSV...")
     sent_raw, article_count, sentiment_df = build_monthly_sentiment_features(
         news_path=NEWS_PATH,
         tickers=config.assets,
@@ -247,13 +247,13 @@ def run_full_experiment():
     # ============================================
     # Sentiment BL: Baseline Omega
     # ============================================
-    print("Running RAW Sentiment BL (Baseline Omega)...")
+    print("Running Sentiment BL (Baseline Omega)...")
     res_sent_baseline = run_single_strategy_backtest(
         config=config,
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="RAW Sentiment BL (Baseline Omega)",
+        strategy_name="Sentiment BL (Baseline Omega)",
         build_q_views_fn=sentiment_q_builder,
         omega_method="baseline",
     )
@@ -262,13 +262,13 @@ def run_full_experiment():
     # ============================================
     # Sentiment BL: Advanced Omega
     # ============================================
-    print("Running RAW Sentiment BL (Advanced Omega)...")
+    print("Running Sentiment BL (Advanced Omega)...")
     res_sent_adv = run_single_strategy_backtest(
         config=config,
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="RAW Sentiment BL (Advanced Omega)",
+        strategy_name="Sentiment BL (Advanced Omega)",
         build_q_views_fn=sentiment_q_builder,
         omega_method="advanced",
         kappa=0.25,
@@ -278,7 +278,7 @@ def run_full_experiment():
     # ============================================
     # Sentiment Dynamic BL
     # ============================================
-    print("Running RAW Sentiment Dynamic BL...")
+    print("Running Sentiment Dynamic BL...")
     kappa_grid = [0.1, 0.25, 0.5, 0.75, 1.0, 1.5]
     n_months = len(monthly_rets)
     grid_returns_track = {k: np.zeros(n_months) for k in kappa_grid}
@@ -288,7 +288,7 @@ def run_full_experiment():
     n_assets = len(config.assets)
     market_weights = np.ones(n_assets) / n_assets
 
-    print(" -> Pre-computing grid search for RAW Sentiment Dynamic BL...")
+    print(" -> Pre-computing grid search for Sentiment Dynamic BL...")
     for t in range(config.window_months, n_months - 1):
         y_train_m = monthly_rets.iloc[t - config.window_months + 1 : t + 1].values
         X_train_m = sentiment_df.iloc[t - config.window_months : t].values
@@ -376,7 +376,7 @@ def run_full_experiment():
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="RAW Sentiment Dynamic BL",
+        strategy_name="Sentiment Dynamic BL",
         build_q_views_fn=sentiment_q_builder,
         build_omega_fn=DynamicOmegaBuilder(dynamic_kappas, config.window_months),
         omega_method="advanced",
