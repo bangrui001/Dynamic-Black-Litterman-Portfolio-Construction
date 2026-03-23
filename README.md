@@ -62,11 +62,11 @@ This correlation analysis motivates the central research problem of the project:
   
 * **News Sentiment Signals**: Built from article-level sentiment classifications generated on news articles fetched via the `Alpaca Market Data News API` and saved in `market_news_with_sentiment.csv`. Each record contains the article timestamp, associated ticker symbols, a sentiment label (positive, neutral, or negative), and a confidence score. These raw article-level signals are subsequently aggregated into monthly asset-level predictors through a structured feature engineering pipeline:
   
-* **Directional Encoding**: Each article is mapped into a signed sentiment strength
+* **Directional Encoding**: Each article is mapped into a signed sentiment strength(s)
 
-  $$
-  S = \text{Label} \times \text{Score}
-  $$
+<p align="center">
+$$s = \text{Label} \times \text{Score}$$
+</p>
 
   * **Label**: "positive" becomes $1$, "negative" becomes $-1$, and "neutral" becomes $0$.
   * **Temporal Aggregation (Monthly Matrix)**: The code shifts individual articles to a monthly view by grouping all articles by the Month and Ticker.
@@ -135,13 +135,8 @@ $$\Sigma_{shrink} = (1 - s)S + s F$$
 * **L2 Regularized Covariance (Optimization-based)**: Estimates the covariance matrix by solving a regularized projection problem that stays close to the sample covariance while penalizing the Frobenius norm:
 
 $$
-\Sigma_{L2}
-=
-\arg\min_{\Sigma \succeq 0}
-\left\|\Sigma - S\right\|_F^2 + \lambda \left\|\Sigma\right\|_F^2
+\Sigma_{L2} = \arg\min_{\Sigma \succeq 0} \left\|\Sigma - S\right\|_F^2 + \lambda \left\|\Sigma\right\|_F^2
 $$
-
-
 
 ### 5. Turnover-Aware Portfolio Optimization
 
