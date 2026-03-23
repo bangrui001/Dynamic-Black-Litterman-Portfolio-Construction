@@ -309,31 +309,34 @@ The following table synthesizes the performance across all major strategies, com
 
 #### **Comprehensive Evaluation Matrix**
 
-| Metric | Equal Weight (1/N) | Benchmark 1 (MVO) | Benchmark 2 (Standard BL) | Dynamic BL (Sample) | Dynamic BL (L2 Reg) | Dynamic BL (Shrinkage) | Sentiment BL (Baseline Ω) | Sentiment BL (Advanced Ω) | Sentiment Dynamic BL |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Annualized Return** | 17.10% | **40.49%** | 26.51% | 20.94% | 16.17% | 22.36% | 22.01% | 23.93% | 23.54% |
-| **Sharpe Ratio** | 1.145 | 1.161 | 1.096 | **1.182** | 1.085 | 1.171 | 1.155 | 1.177 | 1.045 |
-| **Information Ratio** | N/A | **0.894** | 0.610 | 0.458 | -0.455 | 0.551 | 0.668 | 0.717 | 0.485 |
-| **Maximum Drawdown** | **-20.29%** | -45.25% | -31.65% | -26.28% | -20.39% | -26.70% | -27.81% | -30.09% | -35.54% |
-| **Annualized Volatility** | 14.94% | 34.88% | 24.18% | 17.73% | **14.90%** | 19.09% | 19.06% | 20.34% | 22.52% |
-| **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.32% | **-5.268%** | -8.55% | -8.18% | -8.71% | -9.07% |
-| **Annualized Turnover** | 0.00% | 71.00% | 399.22% | 95.48% | **20.35%** | 96.22% | 6.14% | 15.72% | 37.68% |
+## Portfolio Performance Metrics
+
+The following table compares the performance of the Sentiment-Driven Dynamic Black-Litterman (BL) models against traditional benchmarks. The **Sentiment Dynamic BL** represents the core strategy integrating directional sentiment encoding into the prior distribution.
+
+| Metric | Equal Weight (1/N) | Benchmark 1 (MVO) | Benchmark 2 (Std BL) | Sentiment Dynamic BL | Dynamic BL (Sample) | Dynamic BL (L2 Reg) | Dynamic BL (Shrink) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Annualized Return** | 17.10% | **40.49%** | 26.51% | 21.94% | 20.94% | 16.17% | 22.36% |
+| **Sharpe Ratio** | 1.145 | 1.161 | 1.096 | 1.126 | **1.182** | 1.085 | 1.171 |
+| **Information Ratio** | N/A | **0.894** | 0.610 | 0.540 | 0.458 | -0.455 | 0.551 |
+| **Maximum Drawdown** | **-20.29%** | -45.25% | -31.65% | -27.53% | -26.28% | -20.39% | -26.70% |
+| **Annualized Volatility** | 14.94% | 34.88% | 24.18% | 19.47% | 17.73% | **14.90%** | 19.09% |
+| **Value at Risk (95%)** | -5.270% | -12.73% | -10.59% | -8.84% | -8.32% | **-5.268%** | -8.55% |
+| **Annualized Turnover** | 0.00% | 71.00% | 399.22% | 34.35% | 95.48% | **20.35%** | 96.22% |
+
+---
 
 **Dynamic BL (Macro-Feature):**  
 A Black-Litterman model with dynamically calibrated view uncertainty, where $\kappa$ is optimized via Walk-Forward Optimization to adapt the signal-to-noise balance across evolving market regimes.
 
-**Sentiment BL:**  
-A Black-Litterman model in which investor views are generated directly from market news sentiment signals using asset-level Ridge regressions. Instead of relying on macroeconomic predictors, expected return views are inferred from the relationship between recent sentiment intensity and next-period realized returns.
 
 **Sentiment Dynamic BL:**  
-Extends the sentiment-driven framework by dynamically tuning the uncertainty scaling parameter $\kappa$ through walk-forward Sharpe-ratio maximization, allowing the model to adaptively adjust confidence in sentiment-based signals over time.
+A Black-Litterman model in which investor views are generated directly from market news sentiment signals using asset-level Ridge regressions. This model extends the sentiment-driven framework by dynamically tuning the uncertainty scaling parameter $\kappa$ through walk-forward Sharpe-ratio maximization, allowing the model to adaptively adjust confidence in sentiment-based signals over time.
 
 The reported results are constructed from outputs in the following directories:
 
 - `results_omega_methods_sample_cov_backtest`
 - `results_dynamic_kappa_cov_backtest`
 - `result_sentiment_adjusted_Q`
-- `result_sentiment_adjusted_Q_raw`
 
 All Sharpe ratios are computed under the assumption of a zero risk-free rate.
 
