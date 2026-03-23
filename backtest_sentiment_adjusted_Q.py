@@ -30,28 +30,33 @@ ASSETS = [
 
 
 # =========================================================
-# 2. BUILD MONTHLY SENTIMENT MATRIX
+# 2. BUILD MONTHLY RAW SENTIMENT MATRIX
 # =========================================================
 def build_monthly_sentiment_features(
     news_path: str,
     tickers: list[str],
     monthly_index: pd.Index,
-    article_shrink_k: float = 10.0,
-    zscore_min_periods: int = 12,
-    ewm_com: float = 2.0,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Build monthly sentiment features from a CSV with columns:
+    Build RAW monthly sentiment features from a CSV with columns:
       timestamp, symbols, headline, summary, sentiment_label, sentiment_score
+
+    RAW means:
+    - use only sentiment label mapping {-1, 0, 1}
+    - no confidence scaling
+    - no cross-ticker weighting
+    - no article-count shrinkage
+    - no z-score normalization
+    - no smoothing
 
     Returns
     -------
     sent_raw : DataFrame
-        Monthly weighted raw sentiment after article-count shrinkage.
+        Monthly raw sentiment using simple label mapping {-1, 0, 1}.
     article_count : DataFrame
         Monthly article count per ticker.
-    sent_z_smooth : DataFrame
-        Smoothed expanding-z-score sentiment matrix aligned to monthly_index.
+    sent_feature_df : DataFrame
+        Same as sent_raw, aligned to monthly_index.
     """
     news = pd.read_csv(news_path, low_memory=False)
 
@@ -80,33 +85,23 @@ def build_monthly_sentiment_features(
         return []
 
     news["symbols"] = news["symbols"].apply(parse_symbols)
-    news["n_symbols"] = news["symbols"].apply(len)
 
     news_exploded = news.explode("symbols").rename(columns={"symbols": "ticker"})
     news_exploded = news_exploded[news_exploded["ticker"].isin(set(tickers))].copy()
 
+    # RAW sentiment: direction only
     label_sign = {"positive": 1, "negative": -1, "neutral": 0}
-    news_exploded["sign"] = news_exploded["sentiment_label"].map(label_sign).fillna(0.0)
-
-    # Convert classifier confidence into signed signal in [-1, 1]
-    news_exploded["sent_strength"] = (
-        news_exploded["sign"] * (2.0 * news_exploded["sentiment_score"] - 1.0)
-    )
-    news_exploded.loc[
-        news_exploded["sentiment_label"].eq("neutral"),
-        "sent_strength"
-    ] = 0.0
+    direction = news_exploded["sentiment_label"].map(label_sign).fillna(0.0)
+    news_exploded["sent_strength"] = direction * news_exploded["sentiment_score"].fillna(0.0)
 
     news_exploded["month"] = (
         news_exploded["timestamp"].dt.to_period("M").dt.to_timestamp()
     )
 
-    # Downweight broad articles mentioning many tickers
-    news_exploded["w"] = 1.0 / np.sqrt(news_exploded["n_symbols"].clip(lower=1))
-
+    # Simple unweighted monthly average by ticker
     sent_raw = (
-        news_exploded.groupby(["month", "ticker"])
-        .apply(lambda g: np.average(g["sent_strength"], weights=g["w"]))
+        news_exploded.groupby(["month", "ticker"])["sent_strength"]
+        .sum()
         .unstack(level=1)
         .reindex(columns=tickers)
         .fillna(0.0)
@@ -120,25 +115,11 @@ def build_monthly_sentiment_features(
         .fillna(0.0)
     )
 
-    # Shrink sparse months toward zero
-    sent_raw = sent_raw * (article_count / (article_count + article_shrink_k))
-
     # Align to monthly returns index
     sent_raw = sent_raw.reindex(monthly_index).fillna(0.0)
     article_count = article_count.reindex(monthly_index).fillna(0.0)
 
-    def expanding_zscore(series: pd.Series, min_periods: int = 12) -> pd.Series:
-        mu = series.expanding(min_periods=min_periods).mean().shift(1)
-        sd = series.expanding(min_periods=min_periods).std(ddof=0).shift(1)
-        z = (series - mu) / sd
-        return z.replace([np.inf, -np.inf], np.nan).fillna(0.0).clip(-3, 3)
-
-    sent_z = sent_raw.apply(
-        lambda s: expanding_zscore(s, min_periods=zscore_min_periods)
-    )
-    sent_z_smooth = sent_z.ewm(com=ewm_com).mean()
-
-    return sent_raw, article_count, sent_z_smooth
+    return sent_raw, article_count, sent_raw.copy()
 
 
 # =========================================================
@@ -157,10 +138,10 @@ def sentiment_q_builder(
     **kwargs
 ):
     """
-    Build Q from sentiment only.
+    Build Q from RAW sentiment only.
 
     For asset i:
-        r_{i,t+1} = a_i + b_i * sentiment_{i,t} + eps
+        r_{i,t+1} = a_i + b_i * raw_sentiment_{i,t} + eps
 
     Returns
     -------
@@ -213,7 +194,7 @@ def run_full_experiment():
         start_date="2015-01-01",
         end_date="2025-12-31",
         window_months=60,
-        result_dir="result_sentiment_adjusted_Q"
+        result_dir="result_sentiment_adjusted_Q_raw"
     )
 
     print("Fetching market data...")
@@ -223,7 +204,7 @@ def run_full_experiment():
         config.end_date,
     )
 
-    print("Building sentiment features from CSV...")
+    print("Building RAW sentiment features from CSV...")
     sent_raw, article_count, sentiment_df = build_monthly_sentiment_features(
         news_path=NEWS_PATH,
         tickers=config.assets,
@@ -260,7 +241,7 @@ def run_full_experiment():
         config=config,
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
-        macro_df=sentiment_df,   # placeholder; not used by mvo_q_builder
+        macro_df=sentiment_df,  
         strategy_name="Benchmark 1 (MVO)",
         build_q_views_fn=mvo_q_builder,
         bl_posterior_fn=mvo_posterior_fn,
@@ -270,13 +251,13 @@ def run_full_experiment():
     # ============================================
     # Sentiment BL: Baseline Omega
     # ============================================
-    print("Running Sentiment BL (Baseline Omega)...")
+    print("Running RAW Sentiment BL (Baseline Omega)...")
     res_sent_baseline = run_single_strategy_backtest(
         config=config,
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="Sentiment BL (Baseline Omega)",
+        strategy_name="RAW Sentiment BL (Baseline Omega)",
         build_q_views_fn=sentiment_q_builder,
         omega_method="baseline",
     )
@@ -285,13 +266,13 @@ def run_full_experiment():
     # ============================================
     # Sentiment BL: Advanced Omega
     # ============================================
-    print("Running Sentiment BL (Advanced Omega)...")
+    print("Running RAW Sentiment BL (Advanced Omega)...")
     res_sent_adv = run_single_strategy_backtest(
         config=config,
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="Sentiment BL (Advanced Omega)",
+        strategy_name="RAW Sentiment BL (Advanced Omega)",
         build_q_views_fn=sentiment_q_builder,
         omega_method="advanced",
         kappa=0.25,
@@ -301,7 +282,7 @@ def run_full_experiment():
     # ============================================
     # Sentiment Dynamic BL
     # ============================================
-    print("Running Sentiment Dynamic BL...")
+    print("Running RAW Sentiment Dynamic BL...")
     kappa_grid = [0.1, 0.25, 0.5, 0.75, 1.0, 1.5]
     n_months = len(monthly_rets)
     grid_returns_track = {k: np.zeros(n_months) for k in kappa_grid}
@@ -311,7 +292,7 @@ def run_full_experiment():
     n_assets = len(config.assets)
     market_weights = np.ones(n_assets) / n_assets
 
-    print(" -> Pre-computing grid search for Dynamic BL...")
+    print(" -> Pre-computing grid search for RAW Sentiment Dynamic BL...")
     for t in range(config.window_months, n_months - 1):
         y_train_m = monthly_rets.iloc[t - config.window_months + 1 : t + 1].values
         X_train_m = sentiment_df.iloc[t - config.window_months : t].values
@@ -399,7 +380,7 @@ def run_full_experiment():
         monthly_rets=monthly_rets,
         daily_rets=daily_rets,
         macro_df=sentiment_df,
-        strategy_name="Sentiment Dynamic BL",
+        strategy_name="RAW Sentiment Dynamic BL",
         build_q_views_fn=sentiment_q_builder,
         build_omega_fn=DynamicOmegaBuilder(dynamic_kappas, config.window_months),
         omega_method="advanced",

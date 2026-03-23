@@ -64,34 +64,12 @@ This correlation analysis motivates the central research problem of the project:
   
 * **Directional Encoding**: Each article is mapped into a signed sentiment strength
 
-$$
-S =
-\begin{cases}
-+(2c-1), & \text{positive} \\
--(2c-1), & \text{negative} \\
-0, & \text{neutral}
-\end{cases}
-$$
+  $$\text{sent\_strength} = \text{Label} \times \text{Score}$$
 
-where $c$ denotes the classifier confidence score.
-
-* **Cross-Ticker Adjustment**: Articles referencing multiple assets are down-weighted to prevent broad market commentary from dominating firm-specific signals
-
-$$
-w_i = \frac{1}{\sqrt{N_{\text{tickers}}}}
-$$
-
-* **Article-Count Shrinkage**: Sparse coverage months are regularized toward zero using
-
-$$
-S^{adj} =
-S \cdot
-\frac{N}{N + k}
-$$
-
-where $N$ is the number of articles and $k = 10$ controls shrinkage intensity.
-
-* **Expanding Normalization**: Signals are standardized using expanding historical moments and smoothed with exponential weighting to maintain stationarity while avoiding look-ahead bias.
+  * **Label**: "positive" becomes $1$, "negative" becomes $-1$, and "neutral" becomes $0$.
+  * **Temporal Aggregation (Monthly Matrix)**: The code shifts individual articles to a monthly view by grouping all articles by the Month and Ticker.
+  * **The Summation:** It uses .sum() on your sent_strength. For example, if AAPL had 5 positive articles with a strength of $0.5$ each, the value for AAPL that month is $2.5$.
+  * **Alignment:** It uses .reindex(monthly_index) to ensure the sentiment data aligns perfectly with the dates of the market return data.
 
 These processed sentiment features form an alternative predictor matrix $X$ for Ridge Regression-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than relying solely on historical macroeconomic indicators.
 
