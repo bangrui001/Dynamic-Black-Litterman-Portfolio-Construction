@@ -60,8 +60,8 @@ This correlation analysis motivates the central research problem of the project:
   * **Rates Signal**: 1-month absolute change in 10-Year Treasury Yield (**GS10**).
   * **Credit Signal**: 1-month absolute change in the Baa Corporate Bond Yield Spread (**BAA10Y**).
   
-* **News Sentiment Signals**: Constructed from article-level sentiment classifications stored in `market_news_with_sentiment.csv`. Each observation contains a timestamp, referenced ticker symbols, a sentiment label (`positive`, `neutral`, `negative`), and a confidence score. These article-level signals are transformed into monthly asset-level predictors through a structured aggregation pipeline:
-
+* **News Sentiment Signals**: Built from article-level sentiment classifications generated on news articles fetched via the `Alpaca Market Data News API` and saved in `market_news_with_sentiment.csv`. Each record contains the article timestamp, associated ticker symbols, a sentiment label (positive, neutral, or negative), and a confidence score. These raw article-level signals are subsequently aggregated into monthly asset-level predictors through a structured feature engineering pipeline:
+  
 * **Directional Encoding**: Each article is mapped into a signed sentiment strength
 
 $$
@@ -93,7 +93,7 @@ where $N$ is the number of articles and $k = 10$ controls shrinkage intensity.
 
 * **Expanding Normalization**: Signals are standardized using expanding historical moments and smoothed with exponential weighting to maintain stationarity while avoiding look-ahead bias.
 
-These processed sentiment features form an alternative predictor matrix $X$ for Ridge Regression-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than macroeconomic indicators alone.
+These processed sentiment features form an alternative predictor matrix $X$ for Ridge Regression-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than relying solely on historical macroeconomic indicators.
 
 **Predictive Alignment**: The model implements a "point-in-time" approach where macro or news sentiment features at month $t$ are used to predict asset returns for month $t+1$. This structural lag is critical to eliminating look-ahead bias throughout the backtest.
 
@@ -103,7 +103,7 @@ These processed sentiment features form an alternative predictor matrix $X$ for 
 
 ### 1. View Generation (Ridge Regression)
 
-Instead of relying on subjective human inputs, absolute views are generated quantitatively. For each asset $i$, we fit a Ridge Regression model using lagged predictor features $X$ (macroeconomic variables or sentiment signals) to predict the next month's return $y_i$:
+Instead of relying on subjective human inputs, absolute views are generated quantitatively. For each asset $i$, we fit a Ridge Regression model using lagged predictor features $X$ (macroeconomic factors or sentiment signals) to predict the next month's return $y_i$:
 
 $$
 \hat{\beta}_i = \arg\min_{\beta} \|y_i - X\beta\|^2_2 + \alpha \|\beta\|^2_2
