@@ -37,7 +37,7 @@ To better understand the dependence structure of the portfolio universe, we comp
 
 To mitigate look-ahead bias, the correlation analysis is conducted using historical data from **2005–2019**, while the portfolio models are evaluated over **2020–2025** using a rolling training framework.
 
-![EFT and Stock Return Correlation (2005 - 2019)](image-1.png)
+![EFT and Stock Return Correlation (2005 - 2019)](image.png)
 
 The correlation results reveal several important characteristics of the universe:
 
