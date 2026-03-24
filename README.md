@@ -117,7 +117,7 @@ Where $\Sigma$ is the historical covariance, $\delta$ is the risk aversion param
 
 A critical innovation in this project is the treatment of $\Omega$. The engine supports three methodologies:
 
-* **Baseline**: The baseline $\Omega$ is a diagonal matrix whose diagonal entries are the variance of in-sample Ridge regression training residuals.
+* **Baseline**: The baseline $\Omega$ is a diagonal matrix whose entries are the variances of the in-sample residuals from the Ridge regression.
 * **Advanced (Fixed Kappa)**: Assumes view uncertainty is proportional to the market covariance: $\Omega = \kappa \Sigma$.
 * **Dynamic WFO**: A Walk-Forward Optimization approach that simulates past performance over a rolling 24-month window to dynamically select the optimal $\kappa_t$ from a predefined grid that maximizes the historical Sharpe ratio.
 
