@@ -35,7 +35,7 @@ The portfolio consists of 20 diverse assets specifically selected to represent a
 
 To better understand the dependence structure of the portfolio universe, we compute return correlations for ETFs, individual stocks, and the combined asset universe, and visualize the cross-sectional relationships using correlation heatmaps. These assets define the investment universe for portfolio construction.
 
-To mitigate look-ahead bias, the correlation analysis is conducted using historical data from **2005–2019**, while the portfolio models are evaluated over **2020–2025** using a rolling training framework.
+To mitigate look-ahead bias, the correlation analysis is conducted using historical data from **2005–2019**, while the portfolio models are evaluated over **2021–2025** using a rolling training framework.
 
 ![EFT and Stock Return Correlation (2005 - 2019)](image.png)
 
@@ -72,8 +72,8 @@ $$s = \text{Label} \times \text{Score}$$
 
   * **Label**: "positive" becomes $1$, "negative" becomes $-1$, and "neutral" becomes $0$.
   * **Temporal Aggregation (Monthly Matrix)**: The code shifts individual articles to a monthly view by grouping all articles by the Month and Ticker.
-  * **The Summation:** It uses .sum() on your sent_strength. For example, if AAPL had 5 positive articles with a strength of $0.5$ each, the value for AAPL that month is $2.5$.
-  * **Alignment:** It uses .reindex(monthly_index) to ensure the sentiment data aligns perfectly with the dates of the market return data.
+  * **The Summation:** It uses `.sum()` on sent_strength. For example, if AAPL had 5 positive articles with a strength of $0.5$ each, the value for AAPL that month is $2.5$.
+  * **Alignment:** It uses `.reindex(monthly_index)` to ensure the sentiment data aligns perfectly with the dates of the market return data.
 
 These processed sentiment features form an alternative predictor matrix $X$ for Ridge Regression-based view construction, allowing the Black-Litterman model to generate expected returns directly from forward-looking textual information rather than relying solely on historical macroeconomic indicators.
 
