@@ -137,6 +137,7 @@ $$\Sigma_{shrink} = (1 - s)S + s F$$
 $$
 \Sigma_{L2} = \arg\min_{\Sigma \succeq 0} \left\|\Sigma - S\right\|_F^2 + \lambda \left\|\Sigma\right\|_F^2
 $$
+l2_penalty = 0.10
 
 ### 5. Turnover-Aware Portfolio Optimization
 
